@@ -12,7 +12,6 @@ server_socket.listen()
 users = {}
 rooms = {}
 locked = threading.Lock()
-recipient = message["reciever"]
 
 def handle_client(client_socket):
     data = client_socket.recv(1024).decode('utf-8')
@@ -29,7 +28,12 @@ def handle_client(client_socket):
         else:
             client_socket.send("User not found".encode('utf-8'))
         elif message["status"] == "group":
-            pass
+            room_name = message["receiver"]
+            if room_name in rooms:
+                for member in rooms[room_name]:
+                    users[member].send(f"{message['sender']} [{room_name}]: {message['text']}".encode('utf-8'))
+            else:
+                client_socket.send("Room unable to create")
         elif message["status"] == "create":
             room_name = message["receiver"]
             if room_name not in rooms:
