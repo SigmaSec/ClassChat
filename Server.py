@@ -2,7 +2,7 @@ import socket
 import threading
 import json
 
-host = "0.0.0.0"
+host = "127.0.0.1"
 port = 5555
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
