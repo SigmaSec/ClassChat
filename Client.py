@@ -15,7 +15,8 @@ def send_messages(client_socket, username):
         try:
             message = input()
             parts = message.split()
-
+            if len(parts) == 0:
+                continue
             if parts[0] == "/private":
                 data = {
                     "status": "private",
@@ -56,6 +57,8 @@ def send_messages(client_socket, username):
                     "text": ""
                 }
                 client_socket.send(json.dumps(data).encode('utf-8'))
+                client_socket.close()
+                break
         except:
             print("Error sending message")
             break
@@ -79,3 +82,5 @@ def start_client():
 
     send_thread = threading.Thread(target=send_messages, args=(client_socket, username))
     send_thread.start()
+if __name__ == "__main__":
+    start_client()

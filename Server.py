@@ -14,47 +14,54 @@ rooms = {}
 locked = threading.Lock()
 
 def handle_client(client_socket):
-    data = client_socket.recv(1024).decode('utf-8')
-    message = json.loads(data)
-    username = message["sender"]
-    with locked:
-        users[username] = client_socket
-    while True:
+    try:
         data = client_socket.recv(1024).decode('utf-8')
         message = json.loads(data)
-        if message["status"] == "private":
-            recipient = message["receiver"]
-            if recipient in users:
-                users[recipient].send(f"{message['sender']}: {message['text']}".encode('utf-8'))
-            else:
-                client_socket.send("User not found".encode('utf-8'))
-        elif message["status"] == "group":
-            room_name = message["receiver"]
-            if room_name in rooms:
-                for member in rooms[room_name]:
-                    users[member].send(f"{message['sender']} [{room_name}]: {message['text']}".encode('utf-8'))
-            else:
-                client_socket.send("Room unable to create".encode('utf-8'))
-        elif message["status"] == "create":
-            room_name = message["receiver"]
-            if room_name not in rooms:
-                with locked: 
-                    rooms[room_name] = [username]
-                client_socket.send("Room created sucessfully".encode('utf-8'))
-            else:
-                client_socket.send("Room already exists".encode('utf-8'))
-        elif message["status"] == "join":
-            room_name = message["receiver"]
-            if room_name in rooms:
+        username = message["sender"]
+        with locked:
+            users[username] = client_socket
+        while True:
+            data = client_socket.recv(1024).decode('utf-8')
+            message = json.loads(data)
+            if message["status"] == "private":
+                recipient = message["receiver"]
+                if recipient in users:
+                    users[recipient].send(f"{message['sender']}: {message['text']}".encode('utf-8'))
+                else:
+                    client_socket.send("User not found".encode('utf-8'))
+            elif message["status"] == "group":
+                room_name = message["receiver"]
+                if room_name in rooms:
+                    for member in rooms[room_name]:
+                        users[member].send(f"{message['sender']} [{room_name}]: {message['text']}".encode('utf-8'))
+                else:
+                    client_socket.send("Room unable to create".encode('utf-8'))
+            elif message["status"] == "create":
+                room_name = message["receiver"]
+                if room_name not in rooms:
+                    with locked: 
+                        rooms[room_name] = [username]
+                    client_socket.send("Room created sucessfully".encode('utf-8'))
+                else:
+                    client_socket.send("Room already exists".encode('utf-8'))
+            elif message["status"] == "join":
+                room_name = message["receiver"]
+                if room_name in rooms:
+                    with locked:
+                        rooms[room_name].append(username)
+                    client_socket.send("Joined room sucessfully".encode('utf-8'))
+                else:
+                    client_socket.send("Failed to join room".encode('utf-8'))
+            elif message["status"] == "quit":
                 with locked:
-                    rooms[room_name].append(username)
-                client_socket.send("Joined room sucessfully".encode('utf-8'))
-            else:
-                client_socket.send("Failed to join room".encode('utf-8'))
-        elif message["status"] == "quit":
-            with locked:
+                    del users[username]
+                break
+    except:
+        if username:
+            print(f"{username} disconnected unexpectedly ")
+        with locked:
+            if username and username in users:
                 del users[username]
-            break
 
 def start_server():
     print(f"listening for connection on port {port}")
@@ -63,5 +70,5 @@ def start_server():
         thread = threading.Thread(target=handle_client, args=(client_socket,))
         thread.start()
 
-if __name__ == "__Main__":
+if __name__ == "__main__":
     start_server()
