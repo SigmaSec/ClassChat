@@ -9,8 +9,3 @@ def recieve_messages(client_socket):
 def send_messages(client_socket, username):
     while True:
         message = input()
-
-
-
-#client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#client_socket.connect((host, port))
