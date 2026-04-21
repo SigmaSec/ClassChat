@@ -2,18 +2,18 @@ import socket
 import threading
 import json
 
-host = "127.0.0.1"
+host = "0.0.0.0"
 port = 5555
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind((host, port))
 server_socket.listen()
-
 users = {}
 rooms = {}
 locked = threading.Lock()
 
 def handle_client(client_socket):
+    username = None
     try:
         data = client_socket.recv(1024).decode('utf-8')
         message = json.loads(data)
@@ -55,10 +55,17 @@ def handle_client(client_socket):
             elif message["status"] == "quit":
                 with locked:
                     del users[username]
+                    for room_name in rooms:
+                        if username in rooms[room_name]:
+                            rooms[room_name].remove(username)
+                for memeber in rooms[room_name]:
+                    for memeber in rooms[room_name]:
+                            if memeber in users:
+                                users[memebers].send(f"{username} has left {room_name}".encode('utf-8'))
                 break
     except:
         if username:
-            print(f"{username} disconnected unexpectedly ")
+            print(f"{username} disconnected unexpectedly")
         with locked:
             if username and username in users:
                 del users[username]

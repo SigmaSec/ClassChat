@@ -38,7 +38,7 @@ def send_messages(client_socket, username):
                     "status": "create",
                     "sender": username,
                     "receiver": parts[1],
-                    "text": " ".join(parts[2:])
+                    "text": " "
                 }
                 client_socket.send(json.dumps(data).encode('utf-8'))
             elif parts[0] == "/join":
@@ -46,7 +46,7 @@ def send_messages(client_socket, username):
                     "status": "join",
                     "sender": username,
                     "receiver": parts[1],
-                    "text":" ".join(parts[2:])
+                    "text":" "
                 }
                 client_socket.send(json.dumps(data).encode('utf-8'))
             elif parts[0] == "/quit":
@@ -67,9 +67,7 @@ def start_client():
     port = 5555
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
-
     username = input("Enter your username: ")
-
     registration = {
         "status": "register",
         "sender": username,
@@ -79,7 +77,6 @@ def start_client():
     client_socket.send(json.dumps(registration).encode('utf-8'))
     recieve_thread = threading.Thread(target=recieve_messages, args=(client_socket,))
     recieve_thread.start()
-
     send_thread = threading.Thread(target=send_messages, args=(client_socket, username))
     send_thread.start()
 if __name__ == "__main__":
