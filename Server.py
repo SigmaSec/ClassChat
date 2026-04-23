@@ -61,7 +61,7 @@ def handle_client(client_socket):
                 for memeber in rooms[room_name]:
                     for memeber in rooms[room_name]:
                             if memeber in users:
-                                users[memebers].send(f"{username} has left {room_name}".encode('utf-8'))
+                                users[memeber].send(f"{username} has left {room_name}".encode('utf-8'))
                 break
     except:
         if username:
