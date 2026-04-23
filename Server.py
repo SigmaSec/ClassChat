@@ -33,9 +33,10 @@ def handle_client(client_socket):
                 room_name = message["receiver"]
                 if room_name in rooms:
                     for member in rooms[room_name]:
-                        users[member].send(f"{message['sender']} [{room_name}]: {message['text']}".encode('utf-8'))
+                        if member in users:
+                            users[member].send(f"{message['sender']} [{room_name}]: {message['text']}".encode('utf-8'))
                 else:
-                    client_socket.send("Room unable to create".encode('utf-8'))
+                    client_socket.send("Room does not exist".encode('utf-8'))
             elif message["status"] == "create":
                 room_name = message["receiver"]
                 if room_name not in rooms:
