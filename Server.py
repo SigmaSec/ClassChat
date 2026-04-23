@@ -59,10 +59,10 @@ def handle_client(client_socket):
                     for room_name in rooms:
                         if username in rooms[room_name]:
                             rooms[room_name].remove(username)
-                for memeber in rooms[room_name]:
-                    for memeber in rooms[room_name]:
-                            if memeber in users:
-                                users[memeber].send(f"{username} has left {room_name}".encode('utf-8'))
+                for room_name in rooms:
+                    for member in rooms[room_name]:
+                            if member in users:
+                                users[member].send(f"{username} has left {room_name}".encode('utf-8'))
                 break
     except:
         if username:
